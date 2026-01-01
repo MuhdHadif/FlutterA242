@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "515942179499",
+    "project_id": "my-firebase-app-fd532",
+    "storage_bucket": "my-firebase-app-fd532.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:515942179499:android:c70a559e5f4d7e7b50cdee",
+        "android_client_info": {
+          "package_name": "com.example.firebasefirestorewithrecyclerviewexercise"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCpW5A64SMF-yb_fVndBr3oYaZ6Np_Coss"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:515942179499:android:22123cbaa12d5ebf50cdee",
+        "android_client_info": {
+          "package_name": "com.slumberjer.unigo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCpW5A64SMF-yb_fVndBr3oYaZ6Np_Coss"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
