@@ -1,14 +1,27 @@
 // ignore_for_file: deprecated_member_use
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:unigo/shared/db_helper.dart';
 import 'package:unigo/view/splashscreen.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+
+  log("Handling a background message: ${message.messageId}");
+}
 
 void main() async {
-  runApp(const MyApp());
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   await DBHelper.instance.database; // Ensures db and table created
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -63,4 +76,8 @@ class MyApp extends StatelessWidget {
       home: const SplashScreen(), // Replace with your splash screen
     );
   }
+}
+
+Future<void> _backgroundHandler(RemoteMessage message) async {
+  // Handle background message
 }

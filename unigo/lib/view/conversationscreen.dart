@@ -1,8 +1,11 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:unigo/model/user.dart';
+import 'package:unigo/notif/notificationhandler.dart';
 import 'package:unigo/shared/myconfig.dart';
 
 class ConversationScreen extends StatefulWidget {
@@ -25,6 +28,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
   List<dynamic> messages = [];
   bool isLoading = true;
   TextEditingController messageController = TextEditingController();
+  NotificationHandler notificationHandler = NotificationHandler();
 
   @override
   void initState() {
@@ -72,6 +76,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
       );
 
       if (response.statusCode == 200) {
+        notificationHandler.sendPushNotification(widget.partnerId, widget.user.userName!, content);
         messageController.clear();
         loadConversation();
       }

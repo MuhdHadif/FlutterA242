@@ -1,9 +1,12 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:convert';
+import 'dart:developer';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:unigo/model/user.dart';
+import 'package:unigo/notif/notificationhandler.dart';
 import 'package:unigo/shared/animated_route.dart';
 import 'package:unigo/shared/myconfig.dart';
 import 'package:unigo/view/mainscreen.dart';
@@ -250,7 +253,7 @@ class _LoginScreenState extends State<LoginScreen> {
     http.post(
       Uri.parse("${MyConfig.myurl}/unigo/php/login_user.php"),
       body: {"email": email, "password": password},
-    ).then((response) {
+    ).then((response) async {
       if (response.statusCode == 200) {
         var jsondata = json.decode(response.body);
         if (jsondata['status'] == 'success') {
@@ -262,6 +265,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 Text("Welcome ${user.userName} from ${user.userUniversity}"),
             backgroundColor: Colors.green,
           ));
+
+          // Add user token to Firestore
+          String? token = await FirebaseMessaging.instance.getToken();
+          log("user TOKEN: $token");
+          NotificationHandler notificationHander = NotificationHandler();
+          notificationHander.addUser(user.userId!, token!);
 
           Navigator.of(context).pushReplacement(MaterialPageRoute(
             builder: (_) => MainScreen(user: user),
