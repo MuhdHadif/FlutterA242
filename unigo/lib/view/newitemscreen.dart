@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:unigo/model/user.dart';
+import 'package:unigo/notif/notificationhandler.dart';
 import 'package:unigo/shared/myconfig.dart';
 import 'package:image_cropper/image_cropper.dart';
 
@@ -24,6 +25,7 @@ class _NewItemScreenState extends State<NewItemScreen> {
   final itemController = TextEditingController();
   final descController = TextEditingController();
   final priceController = TextEditingController();
+  NotificationHandler notificationHandler = NotificationHandler();
 
   File? _image;
   Uint8List? webImageBytes;
@@ -155,6 +157,21 @@ class _NewItemScreenState extends State<NewItemScreen> {
                         ),
                       ),
                     ),
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton.icon(
+                      icon: const Icon(Icons.add_box),
+                      label: const Text("2TEST PUSH NOTIF TO ALL"),
+                      onPressed: _testPushNotif,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.amber.shade900,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
                   )
                 ],
               ),
@@ -181,6 +198,10 @@ class _NewItemScreenState extends State<NewItemScreen> {
         validator: (val) => val!.isEmpty ? "$label is required" : null,
       ),
     );
+  }
+
+  void _testPushNotif(){
+    notificationHandler.sendPushNotificationToAll("(TEST) New item was added!", "ITEM NAME");
   }
 
   void insertItemDialog() {
@@ -233,6 +254,7 @@ class _NewItemScreenState extends State<NewItemScreen> {
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
       if (jsonResponse['status'] == 'success') {
+        notificationHandler.sendPushNotificationToAll("New item was added!", itemController.text);
         _showSnackbar("Item added successfully", color: Colors.green);
         Navigator.pop(context);
       } else {

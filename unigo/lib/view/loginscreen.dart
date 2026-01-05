@@ -267,10 +267,8 @@ class _LoginScreenState extends State<LoginScreen> {
           ));
 
           // Add user token to Firestore
-          String? token = await FirebaseMessaging.instance.getToken();
-          log("user TOKEN: $token");
           NotificationHandler notificationHander = NotificationHandler();
-          notificationHander.addUser(user.userId!, token!);
+          notificationHander.addUser(user.userId!);
 
           Navigator.of(context).pushReplacement(MaterialPageRoute(
             builder: (_) => MainScreen(user: user),

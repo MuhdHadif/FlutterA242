@@ -8,22 +8,15 @@ import 'package:cloud_functions/cloud_functions.dart';
 class NotificationHandler {
   CollectionReference users = FirebaseFirestore.instance.collection('users');
 
-  Future<void> addUser(String id, String token){
+  Future<void> addUser(String id) async {
+    String? token = await FirebaseMessaging.instance.getToken();
+    log("user TOKEN: $token");
     return users.doc(id).set({
       'token': token,
     })
     // ignore: invalid_return_type_for_catch_error
     .catchError((error) => log("Failed to add user: $error"));
   }
-
-  // Future<String?> getUserToken(String userId) async {
-  //   DocumentSnapshot doc = await users.doc(userId).get();
-
-  //   if (doc.exists) {
-  //     return doc['token'] as String;
-  //   }
-  //   return null;
-  // }
 
   Future<void> sendPushNotification(String receiverId, String title, String body) async {
     log("Receiver ID: $receiverId");
@@ -41,15 +34,67 @@ class NotificationHandler {
       return;
     }
 
-    log("Token: $token");
+    log("Receiver Token: $token");
 
     final callable = FirebaseFunctions.instance.httpsCallable('sendPushToUser');
 
     log("Calling cloud func");
     await callable.call({
-      'token': token,
+      'tokens': token,
       'title': title,
       'body': body,
+      'data': {
+        'screen': 'messagescreen',
+        'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+      }
     });
+  }
+
+  Future<void> sendPushNotificationToAll(String title, String body) async {
+    log("Sending push notification to all users");
+
+    final querySnapshot = await users.get();
+
+    List<String> tokens = [];
+
+    for (var doc in querySnapshot.docs) {
+      final data = doc.data() as Map<String, dynamic>;
+      final String? token = data['token'];
+
+      if (token != null && token.isNotEmpty) {
+        tokens.add(token);
+      }
+    }
+
+    if (tokens.isEmpty) {
+      log("No FCM tokens found — aborting");
+      return;
+    }
+
+    log("Total tokens found: ${tokens.length}");
+
+    final callable =
+        FirebaseFunctions.instance.httpsCallable('sendPushToUser');
+
+    // Send in chunks of 500 (FCM limit)
+    const int chunkSize = 500;
+    for (var i = 0; i < tokens.length; i += chunkSize) {
+      final chunk = tokens.sublist(
+        i,
+        i + chunkSize > tokens.length ? tokens.length : i + chunkSize,
+      );
+
+      await callable.call({
+        'tokens': chunk,
+        'title': title,
+        'body': body,
+        'data': {
+          'screen': 'mainscreen',
+          'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+        }
+      });
+    }
+
+    log("Push notification sent to all users");
   }
 }
